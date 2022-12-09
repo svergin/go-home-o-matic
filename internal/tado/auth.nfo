@@ -1,0 +1,33 @@
+{
+	config: {
+		version: 'v969',
+		environment: 'production',
+		debugEnabled: false,
+		logEndpoint: 'https://ovihbsxusa.execute-api.eu-west-1.amazonaws.com/log/event',
+		baseUrl: 'https://my.tado.com',
+		tgaEndpoint: 'https://my.tado.com',
+		tgaRestApiEndpoint: 'https://my.tado.com/api/v1',
+		tgaRestApiV2Endpoint: 'https://my.tado.com/api/v2',
+		susiApiEndpoint: 'https://susi.tado.com/api',
+		homeBackendBaseUrl: 'https://my.tado.com/home/show',
+		hvacApiEndpoint: 'https://hvactool.tado.com',
+		hvacIncludeInstallFlowsUnderDevelopment: false,
+		genieRestApiV2Endpoint: 'https://genie.tado.com/api/v2',
+		ivarRestApiEndpoint: 'https://ivar.tado.com',
+		minderRestApiEndpoint: 'https://minder.tado.com/v1',
+		gaTrackingId: 'UA-36131363-7',
+		oauth: {
+			clientApiEndpoint: 'https://my.tado.com/oauth/clients',
+			apiEndpoint: 'https://auth.tado.com/oauth',
+			clientId: 'tado-web-app',
+			clientSecret: 'wZaRN7rpjn3FoNyF5IFuxg9uMzYJcvOoQ8QWiIqS3hfk6gLhVlG57j5YNoZL2Rtc'
+		}
+	}
+}
+## get bearer token
+curl -s "https://auth.tado.com/oauth/token" -d client_id=tado-web-app -d grant_type=password -d scope=home.user -d username="vergin@gmx.net" -d password="XXXXXX!" -d client_secret=wZaRN7rpjn3FoNyF5IFuxg9uMzYJcvOoQ8QWiIqS3hfk6gLhVlG57j5YNoZL2Rtc
+
+{"access_token":"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0NzU1Y2JmYi05ODA0LTQzMzUtODg4YS1kYzdiZDE5OWU3OTIiLCJ0YWRvX2hvbWVzIjpbeyJpZCI6ODM2NTE1fV0sImlzcyI6InRhZG8iLCJsb2NhbGUiOiJkZSIsImF1ZCI6InBhcnRuZXIiLCJuYmYiOjE2NzA1ODE1MjQsInRhZG9fc2NvcGUiOlsiaG9tZS51c2VyIl0sInRhZG9fdXNlcm5hbWUiOiJ2ZXJnaW5AZ214Lm5ldCIsIm5hbWUiOiJTdmVuIFZlcmdpbiIsImV4cCI6MTY3MDU4MjEyNCwiaWF0IjoxNjcwNTgxNTI0LCJ0YWRvX2NsaWVudF9pZCI6InRhZG8td2ViLWFwcCIsImp0aSI6IjQ3ZThmYWEwLTNiNTAtNDk2Zi05NGY1LWQ0ZmVjYzAxZWYyMCIsImVtYWlsIjoidmVyZ2luQGdteC5uZXQifQ.BJBs9as0sT_GJqv_64cN1m8dr7oQQTLF4HwpMioBAfKcqlbD_NVQY1rITBK4fbUnYaqAqMhmx-PrPjXV7iNi1fwSsix3C5k7foTjHT59eI8LN203lO9XFFzZvvst0G2NoHZSUrigg_TcDHO7o8lCr-lk7qUHHLaJmREiWg9atHNb1O5J2Qb81tX1Zsdm4vWY4levXnxoZ7wkU6KJ1P-pLcFt6mM22Rmb5IKk_U1vguf-wqJixkbGyfNMxVqt1Nj49mSv-T_KUl_BP1MpUaK7xCmUJFVNJ3IjGVf_BUVGMogh6q-tBUIV59tPTpCb1YJYik3fDlBAlpIZDhAOQxPRdA","token_type":"bearer","refresh_token":"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0NzU1Y2JmYi05ODA0LTQzMzUtODg4YS1kYzdiZDE5OWU3OTIiLCJ0YWRvX2hvbWVzIjpbeyJpZCI6ODM2NTE1fV0sImlzcyI6InRhZG8iLCJsb2NhbGUiOiJkZSIsImF1ZCI6InBhcnRuZXIiLCJuYmYiOjE2NzA1ODE1MjQsInRhZG9fc2NvcGUiOlsiaG9tZS51c2VyIl0sInRhZG9fdXNlcm5hbWUiOiJ2ZXJnaW5AZ214Lm5ldCIsImF0aSI6IjQ3ZThmYWEwLTNiNTAtNDk2Zi05NGY1LWQ0ZmVjYzAxZWYyMCIsIm5hbWUiOiJTdmVuIFZlcmdpbiIsImV4cCI6MTY3MzE3MzUyNCwiaWF0IjoxNjcwNTgxNTI0LCJ0YWRvX2NsaWVudF9pZCI6InRhZG8td2ViLWFwcCIsImp0aSI6ImQzZGM4ZDlhLWMyNjUtNDA4Ni1iNzdiLTRlZmE3M2Y5MTdmOSIsImVtYWlsIjoidmVyZ2luQGdteC5uZXQifQ.za7d47gfpP_1IMyjgKDczeHb5VDLrdZ5YLF7al9PVeUPBhd-ebCeI-1qWY-tA-jm21cCsY-TD358g034Y1idD_BijJDMShQvQQ2AbptH5bR-LjLEDXzJ_Jj4-EnHIHRdd-LkBP3yEanjpM5v4oflOkYIaNm2nkKoYVw2c5uwlTB7r-5teCqVe5Yl9V7McPPLsMWFnw-pbOrsiDjhnc6BaMlc8WdIwNiT6C9x2lkcmt9O_-bof4J70NRId6PFRDEUW9v3a-QwVLGFfoBk5Hm8mUTad_7z79gDBlgkSCWO9Pth_FlN3GZDLp8IXFbrPjqj8Cw_EGLIDe-yMrG6mGxeEA","expires_in":599,"scope":"home.user","jti":"47e8faa0-3b50-496f-94f5-d4fecc01ef20"}
+
+## refresh token
+curl -s "https://auth.tado.com/oauth/token" -d grant_type=refresh_token -d refresh_token=def -d client_id=tado-web-app -d scope=home.user -d client_secret=wZaRN7rpjn3FoNyF5IFuxg9uMzYJcvOoQ8QWiIqS3hfk6gLhVlG57j5YNoZL2Rtc

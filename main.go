@@ -11,8 +11,8 @@ import (
 	"syscall"
 
 	"github.com/halimath/kvlog"
-	"nortal.com/learning-go/skeleton/internal/config"
-	"nortal.com/learning-go/skeleton/internal/health"
+	"github.com/svergin/go-home-o-matic/internal/config"
+	"github.com/svergin/go-home-o-matic/internal/health"
 )
 
 // The main entry point for the service. It wires dependencies and starts the HTTP server.
