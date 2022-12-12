@@ -1,30 +1,78 @@
 package tado
 
 import (
-	"fmt"
+	"context"
+	"encoding/json"
+	"net/http"
 
-	resty "github.com/go-resty/resty/v2"
+	"github.com/gonzolino/gotado/v2"
+	"github.com/svergin/go-home-o-matic/internal/config"
 )
 
-const endpoint_user_info string = "https://my.tado.com/api/v1/me"
-const endpoint_user_auth string = "https://auth.tado.com/oauth/token"
+const home_name = "Home"
 
-type AuthSuccess struct {
-	Accesstoken  string `json:"access_token"`
-	Tokentype    string `json:"token_type"`
-	Refreshtoken string `json:"refresh_token"`
-	ExpiresIn    int    `json:"expires_in"`
-	Scope        string `json:"scope"`
-	JTI          string `json:"jti"`
+type Handler struct {
+	mux http.ServeMux
+	cfg config.Config
 }
 
-func getUserInfo() {
-	client := resty.New()
-	r, err := client.R().Get(endpoint_user_info)
-	if err != nil {
-		fmt.Println("Error: ", err)
+type interalError struct {
+	msg    string
+	status int
+}
+
+func (ie interalError) Error() string {
+	return ie.msg
+}
+
+func Provide(cfg *config.Config) *Handler {
+	h := &Handler{
+		mux: *http.NewServeMux(),
+		cfg: *cfg,
 	}
-	fmt.Println(r)
+
+	h.mux.HandleFunc("/tado/info", h.handleUserInfo)
+	return h
+}
+
+func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	h.mux.ServeHTTP(w, r)
+}
+
+func (h *Handler) handleUserInfo(w http.ResponseWriter, r *http.Request) {
+
+	user, err := getUserInfo(&h.cfg)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(user)
+	w.WriteHeader(http.StatusOK)
+}
+
+func getUserInfo(cfg *config.Config) (*gotado.User, error) {
+	tc := gotado.New(cfg.Tado.ClientID, cfg.Tado.ClientSecret)
+	ctx := context.Background()
+	if cfg.Tado.Username == "" {
+		return nil, interalError{
+			msg:    "username is missing",
+			status: http.StatusBadRequest,
+		}
+	}
+	if cfg.Tado.Password == "" {
+		return nil, interalError{
+			msg:    "password is missing",
+			status: http.StatusBadRequest,
+		}
+	}
+
+	user, err := tc.Me(ctx, cfg.Tado.Username, cfg.Tado.Password)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
 }
 
 /*
@@ -35,28 +83,3 @@ username="vergin@gmx.net"
 password="XXX"
 client_secret=wZaRN7rpjn3FoNyF5IFuxg9uMzYJcvOoQ8QWiIqS3hfk6gLhVlG57j5YNoZL2Rtc
 */
-
-func authorize() (*AuthSuccess, error) {
-	client := resty.New()
-	resp, err := client.R().
-		SetHeaders(map[string]string{
-			"Content-Type":  "application/x-www-form-urlencoded",
-			"cache-control": "no-cache",
-			"Accept":        "application/json",
-		}).
-		SetFormData(map[string]string{
-			"client_id":     "tado-web-app",
-			"grant_type":    "password",
-			"scope":         "home.user",
-			"username":      "vergin@gmx.net",
-			"password":      "xxx",
-			"client_secret": "wZaRN7rpjn3FoNyF5IFuxg9uMzYJcvOoQ8QWiIqS3hfk6gLhVlG57j5YNoZL2Rtc",
-		}).
-		SetResult(&AuthSuccess{}).
-		Post(endpoint_user_auth)
-	if err != nil {
-		return nil, err
-	}
-	return resp.Result().(*AuthSuccess), nil
-
-}

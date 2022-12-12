@@ -1,17 +1,19 @@
 package tado
 
 import (
-	"fmt"
+	"context"
 	"testing"
+
+	"github.com/gonzolino/gotado/v2"
+	. "github.com/halimath/expect-go"
+	"github.com/svergin/go-home-o-matic/internal/config"
 )
 
-func TestXxx(t *testing.T) {
-	getUserInfo()
-}
-func TestAuthorize(t *testing.T) {
-	res, err := authorize()
+func TestGetUserinfo(t *testing.T) {
+	cfg := config.Provide(context.Background())
+	user, err := getUserInfo(&cfg)
 	if err != nil {
 		t.Fatal("Test failed due to: &v", err)
 	}
-	fmt.Println(res.Accesstoken)
+	ExpectThat(t, user).Is(DeepEqual(gotado.User{}))
 }

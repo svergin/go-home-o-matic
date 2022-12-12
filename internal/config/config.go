@@ -12,6 +12,15 @@ import (
 type Config struct {
 	// The TCP port to listen on for HTTP connections
 	HTTPPort int `env:"HTTP_PORT,default=8080"`
+	// TADO Konfiguration
+	Tado TadoConfig
+}
+
+type TadoConfig struct {
+	Username     string `env:"TADO_USERNAME,default="`
+	Password     string `env:"TADO_PASSWORD,default="`
+	ClientID     string `env:"TADO_CLIENT_ID,default=tado-web-app"`
+	ClientSecret string `env:"TADO_CLIENT_ID,default=wZaRN7rpjn3FoNyF5IFuxg9uMzYJcvOoQ8QWiIqS3hfk6gLhVlG57j5YNoZL2Rtc"`
 }
 
 // Provide provides the application's Config by applying default and env values.
