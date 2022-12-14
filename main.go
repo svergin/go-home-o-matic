@@ -29,7 +29,7 @@ func main() {
 	mux := http.NewServeMux()
 	// Register health endpoints
 	mux.Handle("/health/", http.StripPrefix("/health", healthHandler))
-	mux.Handle("/tado/info", tadoHandler)
+	mux.Handle("/tado/", http.StripPrefix("/tado", tadoHandler))
 
 	// Create the server
 	srv := http.Server{

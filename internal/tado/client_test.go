@@ -11,7 +11,7 @@ import (
 
 func TestGetUserinfo(t *testing.T) {
 	cfg := config.Provide(context.Background())
-	user, err := getUserInfo(&cfg)
+	user, err := getUser(&cfg)
 	if err != nil {
 		t.Fatal("Test failed due to: &v", err)
 	}
