@@ -12,7 +12,7 @@ import (
 func TestGetUserinfo(t *testing.T) {
 	ctx := context.Background()
 	cfg := config.Provide(ctx)
-	apiclient := api.Provide(cfg)
+	apiclient := Provide(cfg)
 	user, err := apiclient.GetUser(ctx)
 	if err != nil {
 		t.Fatal("Test failed due to: &v", err)

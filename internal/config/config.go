@@ -12,8 +12,10 @@ import (
 type Config struct {
 	// The TCP port to listen on for HTTP connections
 	HTTPPort int `env:"HTTP_PORT,default=8080"`
-	// TADO Konfiguration
+	// TADO configuration
 	Tado TadoConfig
+	//the database configuration
+	DB Database
 }
 
 type TadoConfig struct {
@@ -21,6 +23,12 @@ type TadoConfig struct {
 	Password     string `env:"TADO_PASSWORD,default="`
 	ClientID     string `env:"TADO_CLIENT_ID,default=tado-web-app"`
 	ClientSecret string `env:"TADO_CLIENT_ID,default=wZaRN7rpjn3FoNyF5IFuxg9uMzYJcvOoQ8QWiIqS3hfk6gLhVlG57j5YNoZL2Rtc"`
+}
+
+type Database struct {
+	User     string `default:"user"`
+	Password string `default:"password"`
+	File     string `default:":memory:"`
 }
 
 // Provide provides the application's Config by applying default and env values.

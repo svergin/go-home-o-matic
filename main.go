@@ -12,9 +12,11 @@ import (
 
 	"github.com/halimath/kvlog"
 	"github.com/svergin/go-home-o-matic/internal/config"
+	"github.com/svergin/go-home-o-matic/internal/database"
 	"github.com/svergin/go-home-o-matic/internal/health"
 	"github.com/svergin/go-home-o-matic/internal/tado/api"
 	tadoBoundary "github.com/svergin/go-home-o-matic/internal/tado/boundary"
+	tadoEntity "github.com/svergin/go-home-o-matic/internal/tado/entity"
 )
 
 // The main entry point for the service. It wires dependencies and starts the HTTP server.
@@ -23,6 +25,8 @@ func main() {
 
 	// Perform the wiring by calling providers in valid order.
 	cfg := config.Provide(ctx)
+	db := database.Provide(&cfg)
+	tadoEntity.Provide(db)
 	healthHandler := health.Provide()
 	tadoAPIClient := api.Provide(cfg)
 	tadoHandler := tadoBoundary.Provide(cfg, tadoAPIClient)
