@@ -1,4 +1,4 @@
-package tado
+package api
 
 import (
 	"context"
@@ -10,8 +10,10 @@ import (
 )
 
 func TestGetUserinfo(t *testing.T) {
-	cfg := config.Provide(context.Background())
-	user, err := getUser(&cfg)
+	ctx := context.Background()
+	cfg := config.Provide(ctx)
+	apiclient := api.Provide(cfg)
+	user, err := apiclient.GetUser(ctx)
 	if err != nil {
 		t.Fatal("Test failed due to: &v", err)
 	}

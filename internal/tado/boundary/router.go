@@ -1,4 +1,4 @@
-package tado
+package boundary
 
 import (
 	"context"
@@ -9,11 +9,13 @@ import (
 	"github.com/gonzolino/gotado/v2"
 	"github.com/halimath/kvlog"
 	"github.com/svergin/go-home-o-matic/internal/config"
+	"github.com/svergin/go-home-o-matic/internal/tado/api"
 )
 
-type Handler struct {
-	mux http.ServeMux
-	cfg config.Config
+type TadoHandler struct {
+	mux    http.ServeMux
+	cfg    config.Config
+	client *api.TadoAPIClient
 }
 
 type interalError struct {
@@ -44,14 +46,11 @@ TODO: UI einbauen
 
 */
 
-func (ie interalError) Error() string {
-	return ie.msg
-}
-
-func Provide(cfg *config.Config) *Handler {
-	h := &Handler{
-		mux: *http.NewServeMux(),
-		cfg: *cfg,
+func Provide(cfg config.Config, tado *api.TadoAPIClient) *TadoHandler {
+	h := &TadoHandler{
+		mux:    *http.NewServeMux(),
+		cfg:    cfg,
+		client: tado,
 	}
 
 	h.mux.HandleFunc("/info", h.handleUserInfo)
@@ -59,16 +58,16 @@ func Provide(cfg *config.Config) *Handler {
 	return h
 }
 
-func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h *TadoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.mux.ServeHTTP(w, r)
 }
 
-func (h *Handler) handleUserInfo(w http.ResponseWriter, r *http.Request) {
+func (h *TadoHandler) handleUserInfo(w http.ResponseWriter, r *http.Request) {
 
-	user, err := getUser(&h.cfg)
+	user, err := h.client.GetUser(r.Context())
 	if err != nil {
 		kvlog.L.Logs("could not get tado user", kvlog.WithErr(err))
-		w.WriteHeader(http.StatusInternalServerError)
+		w.WriteHeader(http.StatusUnauthorized)
 		w.Write([]byte(err.Error()))
 		return
 	}
@@ -77,7 +76,7 @@ func (h *Handler) handleUserInfo(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func (h *Handler) handleHeatingSchedule(w http.ResponseWriter, r *http.Request) {
+func (h *TadoHandler) handleHeatingSchedule(w http.ResponseWriter, r *http.Request) {
 	paramMode := r.URL.Query().Get("mode")
 	paramZone := r.URL.Query().Get("zone")
 	if paramMode == "" || paramZone == "" {
@@ -96,10 +95,10 @@ func (h *Handler) handleHeatingSchedule(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	user, err := getUser(&h.cfg)
+	user, err := h.client.GetUser(r.Context())
 	if err != nil {
 		kvlog.L.Logs("could not get tado user", kvlog.WithErr(err))
-		w.WriteHeader(http.StatusInternalServerError)
+		w.WriteHeader(http.StatusUnauthorized)
 		w.Write([]byte(err.Error()))
 		return
 	}
@@ -370,37 +369,6 @@ func applyForKinderzimmer2(ctx context.Context, mode int, zone *gotado.Zone) err
 		zone.SetHeatingSchedule(ctx, newhs)
 	}
 	return nil
-}
-
-func getUser(cfg *config.Config) (*gotado.User, error) {
-	ctx := context.Background()
-	tc, err := prepareTadoClient(ctx, cfg)
-	if err != nil {
-		return nil, err
-	}
-
-	user, err := tc.Me(ctx, cfg.Tado.Username, cfg.Tado.Password)
-	if err != nil {
-		return nil, err
-	}
-	return user, nil
-}
-
-func prepareTadoClient(ctx context.Context, cfg *config.Config) (*gotado.Tado, error) {
-	tc := gotado.New(cfg.Tado.ClientID, cfg.Tado.ClientSecret)
-	if cfg.Tado.Username == "" {
-		return nil, interalError{
-			msg:    "username is missing",
-			status: http.StatusUnauthorized,
-		}
-	}
-	if cfg.Tado.Password == "" {
-		return nil, interalError{
-			msg:    "password is missing",
-			status: http.StatusUnauthorized,
-		}
-	}
-	return tc, nil
 }
 
 /*
