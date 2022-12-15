@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/gonzolino/gotado/v2"
+	"github.com/halimath/kvlog"
 	"github.com/svergin/go-home-o-matic/internal/config"
 )
 
@@ -66,6 +67,7 @@ func (h *Handler) handleUserInfo(w http.ResponseWriter, r *http.Request) {
 
 	user, err := getUser(&h.cfg)
 	if err != nil {
+		kvlog.L.Logs("could not get tado user", kvlog.WithErr(err))
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
 		return
@@ -96,6 +98,7 @@ func (h *Handler) handleHeatingSchedule(w http.ResponseWriter, r *http.Request) 
 
 	user, err := getUser(&h.cfg)
 	if err != nil {
+		kvlog.L.Logs("could not get tado user", kvlog.WithErr(err))
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
 		return
@@ -105,6 +108,7 @@ func (h *Handler) handleHeatingSchedule(w http.ResponseWriter, r *http.Request) 
 	err = applyHeatingSchedule(ctx, user, toZone(paramZone), toMode(paramMode))
 
 	if err != nil {
+		kvlog.L.Logs("could not apply heating schedule", kvlog.WithErr(err))
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
 		return
@@ -149,7 +153,7 @@ func applyHeatingSchedule(ctx context.Context, user *gotado.User, tadozone strin
 	if err != nil {
 		return err
 	}
-	fmt.Printf("%v was triggered", tadozone)
+	kvlog.L.Logf("%v was triggered", tadozone)
 	switch tadozone {
 	case tadozone_wohnzimmer:
 		return applyForWohnzimmer(ctx, mode, zone)
